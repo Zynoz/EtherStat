@@ -1,5 +1,6 @@
 package controllers;
 
+import businesslogic.JDBC;
 import businesslogic.JsonWorker;
 import businesslogic.Util;
 import businesslogic.Worker;
@@ -17,19 +18,20 @@ import java.net.URL;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 public class StartController implements Initializable{
 
     private ObservableList<JsonWorker> jsonWorkers = FXCollections.observableArrayList();
     private ObservableList<Worker> workers = FXCollections.observableArrayList();
+    private JDBC jdbc;
 
     @FXML
     private TableView table;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        init();
         jsonWorkers.addAll(Util.getWorkers());
         TableColumn workerName = new TableColumn("Name");
         TableColumn avg = new TableColumn("Average");
@@ -56,6 +58,13 @@ public class StartController implements Initializable{
         table.getColumns().add(stale);
         table.getColumns().add(lastSeen);
         table.getColumns().add(time);
+
+    }
+
+    private void init() {
+        jdbc = new JDBC();
+        jdbc.loadDriver();
+        jdbc.establishConnection();
     }
 
     @FXML
@@ -66,6 +75,14 @@ public class StartController implements Initializable{
         convertWorkers();
         for (Worker worker : workers) {
             System.out.println(worker.toString());
+        }
+    }
+
+    @FXML
+    private void dbEntry() {
+        for (Worker worker : workers) {
+            System.out.println(worker.getWorker());
+            jdbc.insert(worker);
         }
     }
 
@@ -82,7 +99,8 @@ public class StartController implements Initializable{
                     json.setReportedHashrate(json.getReportedHashrate().divide(BigDecimal.valueOf(1000000)));
                 }
             }
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:");
+
+            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:");
             LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochSecond(json.getTime()), ZoneId.systemDefault());
             LocalDateTime lastSeen = LocalDateTime.ofInstant(Instant.ofEpochSecond(json.getLastSeen()), ZoneId.systemDefault());
             if (json.getCurrentHashrate() != null) {
@@ -90,7 +108,6 @@ public class StartController implements Initializable{
             } else {
                 workers.add(new Worker(json.getWorker(), time, lastSeen, json.getReportedHashrate(), json.getCurrentHashrate(), json.getValidShares(), json.getInvalidShares(), json.getStaleShares(), json.getAverageHashrate().setScale(2, RoundingMode.DOWN)));
             }
-
         }
     }
 }

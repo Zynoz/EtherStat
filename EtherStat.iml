@@ -10,5 +10,6 @@
     <orderEntry type="library" name="aopalliance-repackaged-2.5.0-b42" level="project" />
     <orderEntry type="library" name="gson-2.6.2" level="project" />
     <orderEntry type="library" name="fx-gson-3.1.0" level="project" />
+    <orderEntry type="library" name="mysql-connector-java-5.1.45-bin" level="project" />
   </component>
 </module>
