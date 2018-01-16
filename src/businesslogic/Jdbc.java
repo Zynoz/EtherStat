@@ -1,12 +1,15 @@
 package businesslogic;
 
-import java.sql.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
-public class JDBC {
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.List;
+
+public class Jdbc {
 
     private Connection connection = null;
-    private Statement stmt = null;
-    private ResultSet rs = null;
 
     public void loadDriver() {
         try {
@@ -19,28 +22,10 @@ public class JDBC {
     public void establishConnection() {
         try {
             connection = DriverManager.getConnection("jdbc:mysql://192.168.0.102/etherstat?user=etherstat&password=Ma1997xi!");
-            stmt = connection.createStatement();
-            rs = stmt.executeQuery("SELECT workerName FROM etherstat");
-
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
             System.out.println("SQLState: " + e.getSQLState());
             System.out.println("VendorError: " + e.getErrorCode());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ignored) {
-                }
-                rs = null;
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException ignored) {
-                }
-                stmt = null;
-            }
         }
     }
 
@@ -60,5 +45,23 @@ public class JDBC {
                 e.printStackTrace();
             }
         }
+    }
+
+    public ObservableList<Worker> getDbEntries() {
+        ObservableList<Worker> workers = FXCollections.observableArrayList();
+        PreparedStatement preparedStatement;
+        ResultSet resultSet;
+        try {
+            preparedStatement = connection.prepareStatement("SELECT * FROM etherstat");
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                Worker worker = new Worker(resultSet.getString("name"));
+                workers.add(worker);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return workers;
     }
 }

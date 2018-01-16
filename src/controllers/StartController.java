@@ -1,6 +1,6 @@
 package controllers;
 
-import businesslogic.JDBC;
+import businesslogic.Jdbc;
 import businesslogic.JsonWorker;
 import businesslogic.Util;
 import businesslogic.Worker;
@@ -18,16 +18,22 @@ import java.net.URL;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 public class StartController implements Initializable{
 
     private ObservableList<JsonWorker> jsonWorkers = FXCollections.observableArrayList();
     private ObservableList<Worker> workers = FXCollections.observableArrayList();
-    private JDBC jdbc;
+    private Jdbc jdbc;
+    private boolean db = true;
 
     @FXML
     private TableView table;
+
+    @FXML
+    private TableView testTable;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -62,9 +68,23 @@ public class StartController implements Initializable{
     }
 
     private void init() {
-        jdbc = new JDBC();
+        jdbc = new Jdbc();
         jdbc.loadDriver();
         jdbc.establishConnection();
+        testTable.setVisible(false);
+    }
+
+    @FXML
+    private void switchView() {
+        if (db) {
+            testTable.setVisible(true);
+            table.setVisible(false);
+            db = false;
+        } else {
+            testTable.setVisible(false);
+            table.setVisible(true);
+            db = true;
+        }
     }
 
     @FXML
@@ -100,7 +120,7 @@ public class StartController implements Initializable{
                 }
             }
 
-            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy/HH:mm:ss");
             LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochSecond(json.getTime()), ZoneId.systemDefault());
             LocalDateTime lastSeen = LocalDateTime.ofInstant(Instant.ofEpochSecond(json.getLastSeen()), ZoneId.systemDefault());
             if (json.getCurrentHashrate() != null) {
