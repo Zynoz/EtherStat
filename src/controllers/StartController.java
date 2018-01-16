@@ -50,7 +50,6 @@ public class StartController implements Initializable {
     @FXML
     private Label calcAvg;
 
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         init();
@@ -68,8 +67,8 @@ public class StartController implements Initializable {
         TableColumn currentDB = new TableColumn("Current");
         TableColumn validDB = new TableColumn("Valid");
         TableColumn staleDB = new TableColumn("Stale");
-        TableColumn<Worker, String> lastSeenDB = new TableColumn<>("Last Seen");
-        TableColumn<Worker, String> timeDB = new TableColumn<>("Time");
+        TableColumn lastSeenDB = new TableColumn<>("Last Seen");
+        TableColumn timeDB = new TableColumn<>("Time");
 
         workerName.setCellValueFactory(new PropertyValueFactory<Worker, String>("worker"));
         avg.setCellValueFactory(new PropertyValueFactory<Worker, String>("averageHashrate"));
