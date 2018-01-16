@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Worker {
+    private int id;
     private String worker;
     private LocalDateTime time;
     private LocalDateTime lastSeen;
@@ -14,7 +15,8 @@ public class Worker {
     private int staleShares;
     private BigDecimal averageHashrate;
 
-    public Worker(String worker, LocalDateTime time, LocalDateTime lastSeen, BigDecimal reportedHashrate, BigDecimal currentHashrate, int validShares, int invalidShares, int staleShares, BigDecimal averageHashrate) {
+    public Worker(int id, String worker, LocalDateTime time, LocalDateTime lastSeen, BigDecimal reportedHashrate, BigDecimal currentHashrate, int validShares, int invalidShares, int staleShares, BigDecimal averageHashrate) {
+        setId(id);
         setWorker(worker);
         setTime(time);
         setLastSeen(lastSeen);
@@ -24,6 +26,14 @@ public class Worker {
         setInvalidShares(invalidShares);
         setStaleShares(staleShares);
         setAverageHashrate(averageHashrate);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getWorker() {

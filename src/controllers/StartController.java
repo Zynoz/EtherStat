@@ -8,6 +8,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -15,17 +17,20 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
-public class StartController implements Initializable{
+public class StartController implements Initializable {
 
     private ObservableList<JsonWorker> jsonWorkers = FXCollections.observableArrayList();
     private ObservableList<Worker> workers = FXCollections.observableArrayList();
-    private ObservableList<Worker> testWorkers = FXCollections.observableArrayList();
+    private ObservableList<Worker> dbEntries = FXCollections.observableArrayList();
+    private ObservableList<String> workerNames = FXCollections.observableArrayList();
+
     private Jdbc jdbc;
     private boolean db = true;
 
@@ -33,13 +38,18 @@ public class StartController implements Initializable{
     private TableView table;
 
     @FXML
-    private TableView testTable;
+    private TableView dbTable;
+
+    @FXML
+    private ComboBox dropDown;
+
+    @FXML
+    private Label calcAvg;
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         init();
-        jsonWorkers.addAll(Util.getWorkers());
         TableColumn workerName = new TableColumn("Name");
         TableColumn avg = new TableColumn("Average");
         TableColumn current = new TableColumn("Current");
@@ -48,15 +58,15 @@ public class StartController implements Initializable{
         TableColumn lastSeen = new TableColumn("Last Seen");
         TableColumn time = new TableColumn("Time");
 
+        TableColumn uuidDB = new TableColumn("ID");
         TableColumn workerNameDB = new TableColumn("Name");
         TableColumn avgDB = new TableColumn("Average");
         TableColumn currentDB = new TableColumn("Current");
         TableColumn validDB = new TableColumn("Valid");
         TableColumn staleDB = new TableColumn("Stale");
-        TableColumn lastSeenDB = new TableColumn("Last Seen");
-        TableColumn timeDB = new TableColumn("Time");
+        TableColumn<Worker, String> lastSeenDB = new TableColumn<>("Last Seen");
+        TableColumn<Worker, String> timeDB = new TableColumn<>("Time");
 
-        convertWorkers();
         workerName.setCellValueFactory(new PropertyValueFactory<Worker, String>("worker"));
         avg.setCellValueFactory(new PropertyValueFactory<Worker, String>("averageHashrate"));
         current.setCellValueFactory(new PropertyValueFactory<Worker, String>("currentHashrate"));
@@ -65,13 +75,14 @@ public class StartController implements Initializable{
         lastSeen.setCellValueFactory(new PropertyValueFactory<Worker, String>("lastSeen"));
         time.setCellValueFactory(new PropertyValueFactory<Worker, String>("time"));
 
+        uuidDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("id"));
         workerNameDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("worker"));
         avgDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("averageHashrate"));
         currentDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("currentHashrate"));
         validDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("validShares"));
         staleDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("staleShares"));
-        lastSeenDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("lastSeen"));
-        timeDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("time"));
+        lastSeenDB.setCellValueFactory(new PropertyValueFactory<>("lastSeen"));
+        timeDB.setCellValueFactory(new PropertyValueFactory<>("time"));
 
         table.setItems(workers);
         table.getColumns().add(workerName);
@@ -82,30 +93,38 @@ public class StartController implements Initializable{
         table.getColumns().add(lastSeen);
         table.getColumns().add(time);
 
-        testTable.setItems(testWorkers);
-        testTable.getColumns().add(workerNameDB);
-        testTable.getColumns().add(avgDB);
-        testTable.getColumns().add(currentDB);
-        testTable.getColumns().add(validDB);
-        testTable.getColumns().add(staleDB);
+        dbTable.setItems(dbEntries);
+        dbTable.getColumns().add(uuidDB);
+        dbTable.getColumns().add(workerNameDB);
+        dbTable.getColumns().add(avgDB);
+        dbTable.getColumns().add(currentDB);
+        dbTable.getColumns().add(validDB);
+        dbTable.getColumns().add(staleDB);
     }
 
     private void init() {
+        dropDown.setItems(workerNames);
+        jsonWorkers.addAll(Util.getWorkers());
+        workers.clear();
+        convertWorkers();
         jdbc = new Jdbc();
         jdbc.loadDriver();
         jdbc.establishConnection();
-        testTable.setVisible(false);
+        dbTable.setVisible(false);
+        getWorkerNames();
     }
 
     @FXML
     private void switchView() {
         if (db) {
-            testTable.setVisible(true);
+            dbEntries.clear();
+            dbEntries.addAll(jdbc.getDbEntries());
+            dbTable.setVisible(true);
             table.setVisible(false);
-            reload();
             db = false;
         } else {
-            testTable.setVisible(false);
+            reload();
+            dbTable.setVisible(false);
             table.setVisible(true);
             db = true;
         }
@@ -115,10 +134,8 @@ public class StartController implements Initializable{
     private void reload() {
         jsonWorkers.clear();
         workers.clear();
-        testWorkers.clear();
-        convertWorkers();
         jsonWorkers.addAll(Util.getWorkers());
-        testWorkers.addAll(jdbc.getDbEntries());
+        convertWorkers();
     }
 
     @FXML
@@ -147,10 +164,30 @@ public class StartController implements Initializable{
             LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochSecond(json.getTime()), ZoneId.systemDefault());
             LocalDateTime lastSeen = LocalDateTime.ofInstant(Instant.ofEpochSecond(json.getLastSeen()), ZoneId.systemDefault());
             if (json.getCurrentHashrate() != null) {
-                workers.add(new Worker(json.getWorker(), time, lastSeen, json.getReportedHashrate(), json.getCurrentHashrate().setScale(2, RoundingMode.DOWN), json.getValidShares(), json.getInvalidShares(), json.getStaleShares(), json.getAverageHashrate().setScale(2, RoundingMode.DOWN)));
+                workers.add(new Worker(0, json.getWorker(), time, lastSeen, json.getReportedHashrate(), json.getCurrentHashrate().setScale(2, RoundingMode.DOWN), json.getValidShares(), json.getInvalidShares(), json.getStaleShares(), json.getAverageHashrate().setScale(2, RoundingMode.DOWN)));
             } else {
-                workers.add(new Worker(json.getWorker(), time, lastSeen, json.getReportedHashrate(), json.getCurrentHashrate(), json.getValidShares(), json.getInvalidShares(), json.getStaleShares(), json.getAverageHashrate().setScale(2, RoundingMode.DOWN)));
+                workers.add(new Worker(0, json.getWorker(), time, lastSeen, json.getReportedHashrate(), json.getCurrentHashrate(), json.getValidShares(), json.getInvalidShares(), json.getStaleShares(), json.getAverageHashrate().setScale(2, RoundingMode.DOWN)));
             }
         }
+    }
+
+    private void getWorkerNames() {
+        for (Worker worker : workers) {
+            workerNames.add(worker.getWorker());
+        }
+    }
+    public void calculateAvg() {
+        int index = dropDown.getSelectionModel().getSelectedIndex();
+        int count = 0;
+        double sum = 0;
+        for (Worker w : jdbc.getDbEntries()) {
+            if (workerNames.get(index).equals(w.getWorker())) {
+                sum += w.getCurrentHashrate().doubleValue();
+                count++;
+            }
+        }
+        double avg = sum / count;
+        DecimalFormat decimalFormat = new DecimalFormat(".##");
+        calcAvg.setText(decimalFormat.format(avg) + " MH/s");
     }
 }

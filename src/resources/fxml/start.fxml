@@ -9,8 +9,10 @@
    <children>
       <Button fx:id="reload" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#reload" text="Reload" />
       <TableView fx:id="table" layoutY="51.0" prefHeight="349.0" prefWidth="600.0" />
-      <Button fx:id="dbentry" layoutX="80.0" layoutY="14.0" mnemonicParsing="false" onAction="#dbEntry" prefHeight="25.0" prefWidth="98.0" text="database entry" />
-      <Button fx:id="viewDB" layoutX="202.0" layoutY="14.0" mnemonicParsing="false" onAction="#switchView" prefHeight="25.0" prefWidth="98.0" text="view database" />
-      <TableView fx:id="testTable" layoutY="51.0" prefHeight="349.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="51.0" />
+      <Button fx:id="viewDB" layoutX="74.0" layoutY="14.0" mnemonicParsing="false" onAction="#switchView" prefHeight="25.0" prefWidth="98.0" text="view database" />
+      <TableView fx:id="dbTable" layoutY="51.0" prefHeight="349.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="51.0" />
+      <Label fx:id="calcAvg" layoutX="513.0" layoutY="18.0" prefHeight="17.0" prefWidth="75.0" />
+      <ComboBox fx:id="dropDown" layoutX="186.0" layoutY="14.0" prefHeight="25.0" prefWidth="216.0" />
+      <Button layoutX="414.0" layoutY="14.0" mnemonicParsing="false" onAction="#calculateAvg" text="calculate avg" />
    </children>
 </AnchorPane>

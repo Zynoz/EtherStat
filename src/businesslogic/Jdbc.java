@@ -4,8 +4,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.sql.*;
-import java.time.LocalDateTime;
-import java.util.List;
 
 public class Jdbc {
 
@@ -56,7 +54,7 @@ public class Jdbc {
             resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                Worker worker = new Worker(resultSet.getString("name"), null, null, null, resultSet.getBigDecimal("current"), resultSet.getInt("valid"), 0, resultSet.getInt("stale"), resultSet.getBigDecimal("avg"));
+                Worker worker = new Worker(resultSet.getInt("id"), resultSet.getString("name"), null, null, null, resultSet.getBigDecimal("current"), resultSet.getInt("valid"), 0, resultSet.getInt("stale"), resultSet.getBigDecimal("avg"));
                 workers.add(worker);
             }
         } catch (SQLException e) {
