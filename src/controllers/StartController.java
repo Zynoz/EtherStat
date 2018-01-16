@@ -7,13 +7,17 @@ import businesslogic.Worker;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
@@ -104,6 +108,8 @@ public class StartController implements Initializable {
 
     private void init() {
         dropDown.setItems(workerNames);
+        table.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> test((Worker) newValue)));
+        dbTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> test((Worker) newValue)));
         jsonWorkers.addAll(Util.getWorkers());
         workers.clear();
         convertWorkers();
@@ -112,6 +118,16 @@ public class StartController implements Initializable {
         jdbc.establishConnection();
         dbTable.setVisible(false);
         getWorkerNames();
+    }
+
+    private void test(Worker worker) {
+        if (worker != null) {
+            for (String w : workerNames) {
+                if (worker.getWorker().equals(w)) {
+                    dropDown.getSelectionModel().select(w);
+                }
+            }
+        }
     }
 
     @FXML
@@ -144,6 +160,34 @@ public class StartController implements Initializable {
             System.out.println(worker.getWorker());
             jdbc.insert(worker);
         }
+    }
+
+    @FXML
+    private void close() {
+        System.exit(0);
+    }
+
+    @FXML
+    private void chooseMiner() {
+
+    }
+
+    @FXML
+    private void about() {
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(getClass().getResource("/resources/fxml/about.fxml"));
+        Scene scene = null;
+        try {
+            scene = new Scene(fxmlLoader.load());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Stage stage = new Stage();
+        stage.setResizable(false);
+        stage.setTitle("About");
+        stage.setScene(scene);
+        stage.setAlwaysOnTop(true);
+        stage.showAndWait();
     }
 
     private void convertWorkers() {
