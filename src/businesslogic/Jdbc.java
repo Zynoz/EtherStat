@@ -49,18 +49,26 @@ public class Jdbc {
 
     public ObservableList<Worker> getDbEntries() {
         ObservableList<Worker> workers = FXCollections.observableArrayList();
-        PreparedStatement preparedStatement;
+        PreparedStatement preparedStatement = null;
         ResultSet resultSet;
         try {
             preparedStatement = connection.prepareStatement("SELECT * FROM etherstat");
             resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                Worker worker = new Worker(resultSet.getString("name"));
+                Worker worker = new Worker(resultSet.getString("name"), null, null, null, resultSet.getBigDecimal("current"), resultSet.getInt("valid"), 0, resultSet.getInt("stale"), resultSet.getBigDecimal("avg"));
                 workers.add(worker);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return workers;
     }

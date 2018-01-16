@@ -15,15 +15,15 @@ public class Worker {
     private BigDecimal averageHashrate;
 
     public Worker(String worker, LocalDateTime time, LocalDateTime lastSeen, BigDecimal reportedHashrate, BigDecimal currentHashrate, int validShares, int invalidShares, int staleShares, BigDecimal averageHashrate) {
-        this.worker = worker;
-        this.time = time;
-        this.lastSeen = lastSeen;
-        this.reportedHashrate = reportedHashrate;
-        this.currentHashrate = currentHashrate;
-        this.validShares = validShares;
-        this.invalidShares = invalidShares;
-        this.staleShares = staleShares;
-        this.averageHashrate = averageHashrate;
+        setWorker(worker);
+        setTime(time);
+        setLastSeen(lastSeen);
+        setReportedHashrate(reportedHashrate);
+        setCurrentHashrate(currentHashrate);
+        setValidShares(validShares);
+        setInvalidShares(invalidShares);
+        setStaleShares(staleShares);
+        setAverageHashrate(averageHashrate);
     }
 
     public String getWorker() {
@@ -39,7 +39,11 @@ public class Worker {
     }
 
     public void setTime(LocalDateTime time) {
-        this.time = time;
+        if (time != null) {
+            this.time = time;
+        } else {
+            this.time = LocalDateTime.now();
+        }
     }
 
     public LocalDateTime getLastSeen() {
@@ -47,7 +51,11 @@ public class Worker {
     }
 
     public void setLastSeen(LocalDateTime lastSeen) {
-        this.lastSeen = lastSeen;
+        if (lastSeen != null) {
+            this.lastSeen = lastSeen;
+        } else {
+            this.lastSeen = LocalDateTime.now();
+        }
     }
 
     public BigDecimal getReportedHashrate() {
@@ -55,7 +63,11 @@ public class Worker {
     }
 
     public void setReportedHashrate(BigDecimal reportedHashrate) {
-        this.reportedHashrate = reportedHashrate;
+        if (reportedHashrate != null) {
+            this.reportedHashrate = reportedHashrate;
+        } else {
+            this.reportedHashrate = BigDecimal.valueOf(0);
+        }
     }
 
     public BigDecimal getCurrentHashrate() {
@@ -63,7 +75,11 @@ public class Worker {
     }
 
     public void setCurrentHashrate(BigDecimal currentHashrate) {
-        this.currentHashrate = currentHashrate;
+        if (currentHashrate != null) {
+            this.currentHashrate = currentHashrate;
+        } else {
+            this.currentHashrate = BigDecimal.valueOf(0);
+        }
     }
 
     public int getValidShares() {
@@ -95,7 +111,11 @@ public class Worker {
     }
 
     public void setAverageHashrate(BigDecimal averageHashrate) {
-        this.averageHashrate = averageHashrate;
+        if (averageHashrate != null) {
+            this.averageHashrate = averageHashrate;
+        } else {
+            this.averageHashrate = BigDecimal.valueOf(0);
+        }
     }
 
     @Override

@@ -25,6 +25,7 @@ public class StartController implements Initializable{
 
     private ObservableList<JsonWorker> jsonWorkers = FXCollections.observableArrayList();
     private ObservableList<Worker> workers = FXCollections.observableArrayList();
+    private ObservableList<Worker> testWorkers = FXCollections.observableArrayList();
     private Jdbc jdbc;
     private boolean db = true;
 
@@ -47,6 +48,14 @@ public class StartController implements Initializable{
         TableColumn lastSeen = new TableColumn("Last Seen");
         TableColumn time = new TableColumn("Time");
 
+        TableColumn workerNameDB = new TableColumn("Name");
+        TableColumn avgDB = new TableColumn("Average");
+        TableColumn currentDB = new TableColumn("Current");
+        TableColumn validDB = new TableColumn("Valid");
+        TableColumn staleDB = new TableColumn("Stale");
+        TableColumn lastSeenDB = new TableColumn("Last Seen");
+        TableColumn timeDB = new TableColumn("Time");
+
         convertWorkers();
         workerName.setCellValueFactory(new PropertyValueFactory<Worker, String>("worker"));
         avg.setCellValueFactory(new PropertyValueFactory<Worker, String>("averageHashrate"));
@@ -55,6 +64,14 @@ public class StartController implements Initializable{
         stale.setCellValueFactory(new PropertyValueFactory<Worker, String>("staleShares"));
         lastSeen.setCellValueFactory(new PropertyValueFactory<Worker, String>("lastSeen"));
         time.setCellValueFactory(new PropertyValueFactory<Worker, String>("time"));
+
+        workerNameDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("worker"));
+        avgDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("averageHashrate"));
+        currentDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("currentHashrate"));
+        validDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("validShares"));
+        staleDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("staleShares"));
+        lastSeenDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("lastSeen"));
+        timeDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("time"));
 
         table.setItems(workers);
         table.getColumns().add(workerName);
@@ -65,6 +82,12 @@ public class StartController implements Initializable{
         table.getColumns().add(lastSeen);
         table.getColumns().add(time);
 
+        testTable.setItems(testWorkers);
+        testTable.getColumns().add(workerNameDB);
+        testTable.getColumns().add(avgDB);
+        testTable.getColumns().add(currentDB);
+        testTable.getColumns().add(validDB);
+        testTable.getColumns().add(staleDB);
     }
 
     private void init() {
@@ -79,6 +102,7 @@ public class StartController implements Initializable{
         if (db) {
             testTable.setVisible(true);
             table.setVisible(false);
+            reload();
             db = false;
         } else {
             testTable.setVisible(false);
@@ -91,11 +115,10 @@ public class StartController implements Initializable{
     private void reload() {
         jsonWorkers.clear();
         workers.clear();
-        jsonWorkers.addAll(Util.getWorkers());
+        testWorkers.clear();
         convertWorkers();
-        for (Worker worker : workers) {
-            System.out.println(worker.toString());
-        }
+        jsonWorkers.addAll(Util.getWorkers());
+        testWorkers.addAll(jdbc.getDbEntries());
     }
 
     @FXML
