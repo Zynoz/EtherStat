@@ -18,12 +18,15 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class StartController implements Initializable {
 
@@ -53,13 +56,12 @@ public class StartController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         init();
-
     }
 
     private void init() {
         dropDown.setItems(workerNames);
-        table.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> test((Worker) newValue)));
-        dbTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> test((Worker) newValue)));
+        table.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> selectWorker((Worker) newValue)));
+        dbTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> selectWorker((Worker) newValue)));
         jsonWorkers.addAll(Util.getWorkers());
         workers.clear();
         convertWorkers();
@@ -127,7 +129,7 @@ public class StartController implements Initializable {
         table.getColumns().add(valid);
         table.getColumns().add(stale);
         table.getColumns().add(lastSeen);
-        table.getColumns().add(time);
+        //table.getColumns().add(time);
 
         dbTable.setItems(dbEntries);
         dbTable.getColumns().add(uuidDB);
@@ -136,9 +138,27 @@ public class StartController implements Initializable {
         dbTable.getColumns().add(currentDB);
         dbTable.getColumns().add(validDB);
         dbTable.getColumns().add(staleDB);
+        //dbTable.getColumns().add(time);
+
+        Runnable runnable = () -> {
+            while (true) {
+                dbEntry();
+                System.out.println("done");
+                try {
+                    Thread.sleep(600000);
+                    //Thread.sleep(30000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        Thread thread = new Thread(runnable);
+        thread.start();
+
     }
 
-    private void test(Worker worker) {
+    private void selectWorker(Worker worker) {
         if (worker != null) {
             for (String w : workerNames) {
                 if (worker.getWorker().equals(w)) {
@@ -152,8 +172,6 @@ public class StartController implements Initializable {
     private void switchView() {
         if (db) {
             reload();
-            dbEntries.clear();
-            dbEntries.addAll(jdbc.getDbEntries());
             dbTable.setVisible(true);
             table.setVisible(false);
             viewDB.setText("show info");
@@ -169,8 +187,10 @@ public class StartController implements Initializable {
 
     @FXML
     private void reload() {
+        dbEntries.clear();
         jsonWorkers.clear();
         workers.clear();
+        dbEntries.addAll(jdbc.getDbEntries());
         jsonWorkers.addAll(Util.getWorkers());
         convertWorkers();
     }
@@ -190,7 +210,7 @@ public class StartController implements Initializable {
 
     @FXML
     private void chooseMiner() {
-        dbEntry();
+
     }
 
     @FXML
@@ -229,9 +249,9 @@ public class StartController implements Initializable {
             LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochSecond(json.getTime()), ZoneId.systemDefault());
             LocalDateTime lastSeen = LocalDateTime.ofInstant(Instant.ofEpochSecond(json.getLastSeen()), ZoneId.systemDefault());
             if (json.getCurrentHashrate() != null) {
-                workers.add(new Worker(0, json.getWorker(), time, lastSeen, json.getReportedHashrate(), json.getCurrentHashrate().setScale(2, RoundingMode.DOWN), json.getValidShares(), json.getInvalidShares(), json.getStaleShares(), json.getAverageHashrate().setScale(2, RoundingMode.DOWN)));
+                workers.add(new Worker(0, json.getWorker(), time, lastSeen, json.getReportedHashrate(), json.getCurrentHashrate().setScale(2, RoundingMode.DOWN), json.getValidShares(), json.getInvalidShares(), json.getStaleShares(), json.getAverageHashrate().setScale(2, RoundingMode.DOWN), Timestamp.valueOf(LocalDateTime.now())));
             } else {
-                workers.add(new Worker(0, json.getWorker(), time, lastSeen, json.getReportedHashrate(), json.getCurrentHashrate(), json.getValidShares(), json.getInvalidShares(), json.getStaleShares(), json.getAverageHashrate().setScale(2, RoundingMode.DOWN)));
+                workers.add(new Worker(0, json.getWorker(), time, lastSeen, json.getReportedHashrate(), json.getCurrentHashrate(), json.getValidShares(), json.getInvalidShares(), json.getStaleShares(), json.getAverageHashrate().setScale(2, RoundingMode.DOWN), Timestamp.valueOf(LocalDateTime.now())));
             }
         }
     }

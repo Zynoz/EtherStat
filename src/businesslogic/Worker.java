@@ -1,6 +1,8 @@
 package businesslogic;
 
 import java.math.BigDecimal;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 public class Worker {
@@ -14,8 +16,9 @@ public class Worker {
     private int invalidShares;
     private int staleShares;
     private BigDecimal averageHashrate;
+    private Timestamp timest;
 
-    public Worker(int id, String worker, LocalDateTime time, LocalDateTime lastSeen, BigDecimal reportedHashrate, BigDecimal currentHashrate, int validShares, int invalidShares, int staleShares, BigDecimal averageHashrate) {
+    public Worker(int id, String worker, LocalDateTime time, LocalDateTime lastSeen, BigDecimal reportedHashrate, BigDecimal currentHashrate, int validShares, int invalidShares, int staleShares, BigDecimal averageHashrate, Timestamp timest) {
         setId(id);
         setWorker(worker);
         setTime(time);
@@ -26,6 +29,15 @@ public class Worker {
         setInvalidShares(invalidShares);
         setStaleShares(staleShares);
         setAverageHashrate(averageHashrate);
+        setTimest(timest);
+    }
+
+    public Timestamp getTimest() {
+        return timest;
+    }
+
+    public void setTimest(Timestamp timest) {
+        this.timest = timest;
     }
 
     public int getId() {
