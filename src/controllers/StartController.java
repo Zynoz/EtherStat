@@ -10,10 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
@@ -39,6 +36,9 @@ public class StartController implements Initializable {
     private boolean db = true;
 
     @FXML
+    private Button viewDB;
+
+    @FXML
     private TableView table;
 
     @FXML
@@ -53,6 +53,22 @@ public class StartController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         init();
+
+    }
+
+    private void init() {
+        dropDown.setItems(workerNames);
+        table.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> test((Worker) newValue)));
+        dbTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> test((Worker) newValue)));
+        jsonWorkers.addAll(Util.getWorkers());
+        workers.clear();
+        convertWorkers();
+        jdbc = new Jdbc();
+        jdbc.loadDriver();
+        jdbc.establishConnection();
+        dbTable.setVisible(false);
+        getWorkerNames();
+
         TableColumn workerName = new TableColumn("Name");
         TableColumn avg = new TableColumn("Average");
         TableColumn current = new TableColumn("Current");
@@ -69,6 +85,23 @@ public class StartController implements Initializable {
         TableColumn staleDB = new TableColumn("Stale");
         TableColumn lastSeenDB = new TableColumn<>("Last Seen");
         TableColumn timeDB = new TableColumn<>("Time");
+
+        workerName.setStyle( "-fx-alignment: CENTER;");
+        avg.setStyle( "-fx-alignment: CENTER;");
+        current.setStyle( "-fx-alignment: CENTER;");
+        valid.setStyle( "-fx-alignment: CENTER;");
+        stale.setStyle( "-fx-alignment: CENTER;");
+        lastSeen.setStyle( "-fx-alignment: CENTER;");
+        time.setStyle( "-fx-alignment: CENTER;");
+
+        uuidDB.setStyle( "-fx-alignment: CENTER;");
+        workerNameDB.setStyle( "-fx-alignment: CENTER;");
+        avgDB.setStyle( "-fx-alignment: CENTER;");
+        currentDB.setStyle( "-fx-alignment: CENTER;");
+        validDB.setStyle( "-fx-alignment: CENTER;");
+        staleDB.setStyle( "-fx-alignment: CENTER;");
+        lastSeenDB.setStyle( "-fx-alignment: CENTER;");
+        timeDB.setStyle( "-fx-alignment: CENTER;");
 
         workerName.setCellValueFactory(new PropertyValueFactory<Worker, String>("worker"));
         avg.setCellValueFactory(new PropertyValueFactory<Worker, String>("averageHashrate"));
@@ -105,20 +138,6 @@ public class StartController implements Initializable {
         dbTable.getColumns().add(staleDB);
     }
 
-    private void init() {
-        dropDown.setItems(workerNames);
-        table.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> test((Worker) newValue)));
-        dbTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> test((Worker) newValue)));
-        jsonWorkers.addAll(Util.getWorkers());
-        workers.clear();
-        convertWorkers();
-        jdbc = new Jdbc();
-        jdbc.loadDriver();
-        jdbc.establishConnection();
-        dbTable.setVisible(false);
-        getWorkerNames();
-    }
-
     private void test(Worker worker) {
         if (worker != null) {
             for (String w : workerNames) {
@@ -132,15 +151,18 @@ public class StartController implements Initializable {
     @FXML
     private void switchView() {
         if (db) {
+            reload();
             dbEntries.clear();
             dbEntries.addAll(jdbc.getDbEntries());
             dbTable.setVisible(true);
             table.setVisible(false);
+            viewDB.setText("show info");
             db = false;
         } else {
             reload();
             dbTable.setVisible(false);
             table.setVisible(true);
+            viewDB.setText("show database");
             db = true;
         }
     }
@@ -168,7 +190,7 @@ public class StartController implements Initializable {
 
     @FXML
     private void chooseMiner() {
-
+        dbEntry();
     }
 
     @FXML
@@ -219,6 +241,7 @@ public class StartController implements Initializable {
             workerNames.add(worker.getWorker());
         }
     }
+
     public void calculateAvg() {
         int index = dropDown.getSelectionModel().getSelectedIndex();
         int count = 0;
