@@ -20,13 +20,8 @@ import java.math.RoundingMode;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class StartController implements Initializable {
 
@@ -64,7 +59,7 @@ public class StartController implements Initializable {
         dbTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> selectWorker((Worker) newValue)));
         jsonWorkers.addAll(Util.getWorkers());
         workers.clear();
-        convertWorkers();
+        //convertWorkers();
         jdbc = new Jdbc();
         jdbc.loadDriver();
         jdbc.establishConnection();
@@ -76,8 +71,7 @@ public class StartController implements Initializable {
         TableColumn current = new TableColumn("Current");
         TableColumn valid = new TableColumn("Valid");
         TableColumn stale = new TableColumn("Stale");
-        TableColumn lastSeen = new TableColumn("Last Seen");
-        TableColumn time = new TableColumn("Time");
+        TableColumn time = new TableColumn("Timestamp");
 
         TableColumn uuidDB = new TableColumn("ID");
         TableColumn workerNameDB = new TableColumn("Name");
@@ -85,15 +79,13 @@ public class StartController implements Initializable {
         TableColumn currentDB = new TableColumn("Current");
         TableColumn validDB = new TableColumn("Valid");
         TableColumn staleDB = new TableColumn("Stale");
-        TableColumn lastSeenDB = new TableColumn<>("Last Seen");
-        TableColumn timeDB = new TableColumn<>("Time");
+        TableColumn timeDB = new TableColumn("Timestamp");
 
         workerName.setStyle( "-fx-alignment: CENTER;");
         avg.setStyle( "-fx-alignment: CENTER;");
         current.setStyle( "-fx-alignment: CENTER;");
         valid.setStyle( "-fx-alignment: CENTER;");
         stale.setStyle( "-fx-alignment: CENTER;");
-        lastSeen.setStyle( "-fx-alignment: CENTER;");
         time.setStyle( "-fx-alignment: CENTER;");
 
         uuidDB.setStyle( "-fx-alignment: CENTER;");
@@ -102,43 +94,40 @@ public class StartController implements Initializable {
         currentDB.setStyle( "-fx-alignment: CENTER;");
         validDB.setStyle( "-fx-alignment: CENTER;");
         staleDB.setStyle( "-fx-alignment: CENTER;");
-        lastSeenDB.setStyle( "-fx-alignment: CENTER;");
         timeDB.setStyle( "-fx-alignment: CENTER;");
 
         workerName.setCellValueFactory(new PropertyValueFactory<Worker, String>("worker"));
-        avg.setCellValueFactory(new PropertyValueFactory<Worker, String>("averageHashrate"));
         current.setCellValueFactory(new PropertyValueFactory<Worker, String>("currentHashrate"));
+        avg.setCellValueFactory(new PropertyValueFactory<Worker, String>("averageHashrate"));
         valid.setCellValueFactory(new PropertyValueFactory<Worker, String>("validShares"));
         stale.setCellValueFactory(new PropertyValueFactory<Worker, String>("staleShares"));
-        lastSeen.setCellValueFactory(new PropertyValueFactory<Worker, String>("lastSeen"));
-        time.setCellValueFactory(new PropertyValueFactory<Worker, String>("time"));
+        time.setCellValueFactory(new PropertyValueFactory<Worker, String>("timest"));
 
         uuidDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("id"));
         workerNameDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("worker"));
-        avgDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("averageHashrate"));
         currentDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("currentHashrate"));
+        avgDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("averageHashrate"));
         validDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("validShares"));
         staleDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("staleShares"));
-        lastSeenDB.setCellValueFactory(new PropertyValueFactory<>("lastSeen"));
-        timeDB.setCellValueFactory(new PropertyValueFactory<>("time"));
+        timeDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("timest"));
 
         table.setItems(workers);
         table.getColumns().add(workerName);
-        table.getColumns().add(avg);
         table.getColumns().add(current);
+        table.getColumns().add(avg);
         table.getColumns().add(valid);
         table.getColumns().add(stale);
-        table.getColumns().add(lastSeen);
-        //table.getColumns().add(time);
+        table.getColumns().add(time);
 
         dbTable.setItems(dbEntries);
         dbTable.getColumns().add(uuidDB);
         dbTable.getColumns().add(workerNameDB);
-        dbTable.getColumns().add(avgDB);
         dbTable.getColumns().add(currentDB);
+        dbTable.getColumns().add(avgDB);
         dbTable.getColumns().add(validDB);
         dbTable.getColumns().add(staleDB);
-        //dbTable.getColumns().add(time);
+        dbTable.getColumns().add(time);
+        reload();
 
         Runnable runnable = () -> {
             while (true) {
@@ -146,16 +135,15 @@ public class StartController implements Initializable {
                 System.out.println("done");
                 try {
                     Thread.sleep(600000);
-                    //Thread.sleep(30000);
+                    //workers.forEach(System.out::println);
+                    //Thread.sleep(10000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         };
-
         Thread thread = new Thread(runnable);
         thread.start();
-
     }
 
     private void selectWorker(Worker worker) {
@@ -190,15 +178,15 @@ public class StartController implements Initializable {
         dbEntries.clear();
         jsonWorkers.clear();
         workers.clear();
-        dbEntries.addAll(jdbc.getDbEntries());
         jsonWorkers.addAll(Util.getWorkers());
         convertWorkers();
+        dbEntries.addAll(jdbc.getDbEntries());
+        getWorkerNames();
     }
 
     @FXML
     private void dbEntry() {
         for (Worker worker : workers) {
-            System.out.println(worker.getWorker());
             jdbc.insert(worker);
         }
     }
@@ -210,7 +198,7 @@ public class StartController implements Initializable {
 
     @FXML
     private void chooseMiner() {
-
+        dbEntry();
     }
 
     @FXML
@@ -244,14 +232,10 @@ public class StartController implements Initializable {
                     json.setReportedHashrate(json.getReportedHashrate().divide(BigDecimal.valueOf(1000000)));
                 }
             }
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy/HH:mm:ss");
-            LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochSecond(json.getTime()), ZoneId.systemDefault());
-            LocalDateTime lastSeen = LocalDateTime.ofInstant(Instant.ofEpochSecond(json.getLastSeen()), ZoneId.systemDefault());
             if (json.getCurrentHashrate() != null) {
-                workers.add(new Worker(0, json.getWorker(), time, lastSeen, json.getReportedHashrate(), json.getCurrentHashrate().setScale(2, RoundingMode.DOWN), json.getValidShares(), json.getInvalidShares(), json.getStaleShares(), json.getAverageHashrate().setScale(2, RoundingMode.DOWN), Timestamp.valueOf(LocalDateTime.now())));
+                workers.add(new Worker(0, json.getWorker(), json.getReportedHashrate(), json.getCurrentHashrate().setScale(2, RoundingMode.DOWN), json.getValidShares(), json.getInvalidShares(), json.getStaleShares(), json.getAverageHashrate().setScale(2, RoundingMode.DOWN), Timestamp.valueOf(LocalDateTime.now())));
             } else {
-                workers.add(new Worker(0, json.getWorker(), time, lastSeen, json.getReportedHashrate(), json.getCurrentHashrate(), json.getValidShares(), json.getInvalidShares(), json.getStaleShares(), json.getAverageHashrate().setScale(2, RoundingMode.DOWN), Timestamp.valueOf(LocalDateTime.now())));
+                workers.add(new Worker(0, json.getWorker(), json.getReportedHashrate(), json.getCurrentHashrate(), json.getValidShares(), json.getInvalidShares(), json.getStaleShares(), json.getAverageHashrate().setScale(2, RoundingMode.DOWN), Timestamp.valueOf(LocalDateTime.now())));
             }
         }
     }
@@ -273,7 +257,7 @@ public class StartController implements Initializable {
             }
         }
         double avg = sum / count;
-        DecimalFormat decimalFormat = new DecimalFormat(".##");
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
         calcAvg.setText(decimalFormat.format(avg) + " MH/s");
     }
 }

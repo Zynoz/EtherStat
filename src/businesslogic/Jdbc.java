@@ -28,7 +28,7 @@ public class Jdbc {
 
     public void establishConnection() {
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://" + localIP + "/etherstat" + "?user=" + localUsername + "&password=" + localPW);
+            connection = DriverManager.getConnection("jdbc:mysql://" + localIP + "/etherstat" + "?user=" + localUsername + "&password=" + localPW +"&useSSL=false");
             //connection = DriverManager.getConnection("jdbc:mysql://" + piIP + "/etherstat" + "?user=" + piUsername + "&password=" + piPW);
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
@@ -65,7 +65,7 @@ public class Jdbc {
             resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                Worker worker = new Worker(resultSet.getInt("id"), resultSet.getString("name"), null, null, null, resultSet.getBigDecimal("current"), resultSet.getInt("valid"), 0, resultSet.getInt("stale"), resultSet.getBigDecimal("avg"), resultSet.getTimestamp("timest"));
+                Worker worker = new Worker(resultSet.getInt("id"), resultSet.getString("name"), null, resultSet.getBigDecimal("current"), resultSet.getInt("valid"), 0, resultSet.getInt("stale"), resultSet.getBigDecimal("avg"), resultSet.getTimestamp("timest"));
                 workers.add(worker);
             }
         } catch (SQLException e) {

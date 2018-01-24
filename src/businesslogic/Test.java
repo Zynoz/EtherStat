@@ -23,7 +23,7 @@ public class Test extends Application {
         primaryStage.setTitle("EtherStat");
         primaryStage.setWidth(600);
         primaryStage.setHeight(400);
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
 
         primaryStage.setScene(scene);
         primaryStage.show();

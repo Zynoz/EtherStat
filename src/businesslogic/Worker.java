@@ -1,15 +1,11 @@
 package businesslogic;
 
 import java.math.BigDecimal;
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 public class Worker {
     private int id;
     private String worker;
-    private LocalDateTime time;
-    private LocalDateTime lastSeen;
     private BigDecimal reportedHashrate;
     private BigDecimal currentHashrate;
     private int validShares;
@@ -18,11 +14,9 @@ public class Worker {
     private BigDecimal averageHashrate;
     private Timestamp timest;
 
-    public Worker(int id, String worker, LocalDateTime time, LocalDateTime lastSeen, BigDecimal reportedHashrate, BigDecimal currentHashrate, int validShares, int invalidShares, int staleShares, BigDecimal averageHashrate, Timestamp timest) {
+    public Worker(int id, String worker, BigDecimal reportedHashrate, BigDecimal currentHashrate, int validShares, int invalidShares, int staleShares, BigDecimal averageHashrate, Timestamp timest) {
         setId(id);
         setWorker(worker);
-        setTime(time);
-        setLastSeen(lastSeen);
         setReportedHashrate(reportedHashrate);
         setCurrentHashrate(currentHashrate);
         setValidShares(validShares);
@@ -54,30 +48,6 @@ public class Worker {
 
     public void setWorker(String worker) {
         this.worker = worker;
-    }
-
-    public LocalDateTime getTime() {
-        return time;
-    }
-
-    public void setTime(LocalDateTime time) {
-        if (time != null) {
-            this.time = time;
-        } else {
-            this.time = LocalDateTime.now();
-        }
-    }
-
-    public LocalDateTime getLastSeen() {
-        return lastSeen;
-    }
-
-    public void setLastSeen(LocalDateTime lastSeen) {
-        if (lastSeen != null) {
-            this.lastSeen = lastSeen;
-        } else {
-            this.lastSeen = LocalDateTime.now();
-        }
     }
 
     public BigDecimal getReportedHashrate() {
@@ -143,15 +113,15 @@ public class Worker {
     @Override
     public String toString() {
         return "Worker{" +
-                "worker='" + worker + '\'' +
-                ", time=" + time +
-                ", lastSeen=" + lastSeen +
+                "id=" + id +
+                ", worker='" + worker + '\'' +
                 ", reportedHashrate=" + reportedHashrate +
                 ", currentHashrate=" + currentHashrate +
                 ", validShares=" + validShares +
                 ", invalidShares=" + invalidShares +
                 ", staleShares=" + staleShares +
                 ", averageHashrate=" + averageHashrate +
+                ", timest=" + timest +
                 '}';
     }
 }
