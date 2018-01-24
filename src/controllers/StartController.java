@@ -55,6 +55,7 @@ public class StartController implements Initializable {
 
     private void init() {
         dropDown.setItems(workerNames);
+
         table.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> selectWorker((Worker) newValue)));
         dbTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> selectWorker((Worker) newValue)));
         jsonWorkers.addAll(Util.getWorkers());
@@ -127,7 +128,9 @@ public class StartController implements Initializable {
         dbTable.getColumns().add(validDB);
         dbTable.getColumns().add(staleDB);
         dbTable.getColumns().add(time);
+
         reload();
+        dropDown.getSelectionModel().selectFirst();
 
         Runnable runnable = () -> {
             while (true) {
@@ -162,7 +165,7 @@ public class StartController implements Initializable {
             reload();
             dbTable.setVisible(true);
             table.setVisible(false);
-            viewDB.setText("show info");
+            viewDB.setText("show recent");
             db = false;
         } else {
             reload();
@@ -178,6 +181,7 @@ public class StartController implements Initializable {
         dbEntries.clear();
         jsonWorkers.clear();
         workers.clear();
+        workerNames.clear();
         jsonWorkers.addAll(Util.getWorkers());
         convertWorkers();
         dbEntries.addAll(jdbc.getDbEntries());
