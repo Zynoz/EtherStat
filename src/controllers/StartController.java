@@ -167,12 +167,14 @@ public class StartController implements Initializable {
             table.setVisible(false);
             viewDB.setText("show recent");
             db = false;
+            dropDown.getSelectionModel().selectFirst();
         } else {
             reload();
             dbTable.setVisible(false);
             table.setVisible(true);
             viewDB.setText("show database");
             db = true;
+            dropDown.getSelectionModel().selectFirst();
         }
     }
 
