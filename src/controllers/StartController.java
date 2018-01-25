@@ -21,6 +21,7 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class StartController implements Initializable {
@@ -32,6 +33,7 @@ public class StartController implements Initializable {
 
     private Jdbc jdbc;
     private boolean db = true;
+    private String minerAddress = "7b1101df6f19c9c6fa5a2b4d2c579aeb52de07b9";
 
     @FXML
     private Button viewDB;
@@ -58,7 +60,7 @@ public class StartController implements Initializable {
 
         table.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> selectWorker((Worker) newValue)));
         dbTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> selectWorker((Worker) newValue)));
-        jsonWorkers.addAll(Util.getWorkers());
+        jsonWorkers.addAll(Util.getWorkers(minerAddress));
         workers.clear();
         //convertWorkers();
         jdbc = new Jdbc();
@@ -184,7 +186,7 @@ public class StartController implements Initializable {
         jsonWorkers.clear();
         workers.clear();
         workerNames.clear();
-        jsonWorkers.addAll(Util.getWorkers());
+        jsonWorkers.addAll(Util.getWorkers(minerAddress));
         convertWorkers();
         dbEntries.addAll(jdbc.getDbEntries());
         getWorkerNames();
@@ -204,7 +206,12 @@ public class StartController implements Initializable {
 
     @FXML
     private void chooseMiner() {
-        dbEntry();
+        TextInputDialog textInputDialog = new TextInputDialog("7b1101df6f19c9c6fa5a2b4d2c579aeb52de07b9");
+        textInputDialog.setTitle("Choose Miner");
+        textInputDialog.setHeaderText("Choose a miner");
+        textInputDialog.setContentText("Please enter a miner address");
+        Optional<String> result = textInputDialog.showAndWait();
+        result.ifPresent(name -> minerAddress = name);
     }
 
     @FXML
