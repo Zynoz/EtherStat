@@ -64,8 +64,6 @@ public class StartController implements Initializable {
         workers.clear();
         //convertWorkers();
         jdbc = new Jdbc();
-        jdbc.loadDriver();
-        jdbc.establishConnection();
         dbTable.setVisible(false);
         getWorkerNames();
 
@@ -131,7 +129,7 @@ public class StartController implements Initializable {
         dbTable.getColumns().add(staleDB);
         dbTable.getColumns().add(time);
 
-        reload();
+
         dropDown.getSelectionModel().selectFirst();
 
         Runnable runnable = () -> {
@@ -212,6 +210,40 @@ public class StartController implements Initializable {
         textInputDialog.setContentText("Please enter a miner address");
         Optional<String> result = textInputDialog.showAndWait();
         result.ifPresent(name -> minerAddress = name);
+    }
+
+    @FXML
+    private void setIP() {
+        TextInputDialog textInputDialog = new TextInputDialog();
+        textInputDialog.setTitle("Choose database server");
+        textInputDialog.setContentText("Enter IP or Domain of database server");
+        Optional<String> result = textInputDialog.showAndWait();
+        result.ifPresent(ip -> jdbc.setIP(ip));
+    }
+
+    @FXML
+    private void setUsername() {
+        TextInputDialog textInputDialog = new TextInputDialog();
+        textInputDialog.setTitle("Choose username for database");
+        textInputDialog.setContentText("Enter username to connect to the database server");
+        Optional<String> result = textInputDialog.showAndWait();
+        result.ifPresent(username -> jdbc.setUsername(username));
+    }
+
+    @FXML
+    private void setPassword() {
+        TextInputDialog textInputDialog = new TextInputDialog();
+        textInputDialog.setTitle("Choose password for database");
+        textInputDialog.setContentText("Enter password for the specified username");
+        Optional<String> result = textInputDialog.showAndWait();
+        result.ifPresent(pw -> jdbc.setPassword(pw));
+    }
+
+    @FXML
+    private void connectDB() {
+        jdbc.loadDriver();
+        jdbc.establishConnection();
+        reload();
     }
 
     @FXML

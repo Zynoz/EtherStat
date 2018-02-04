@@ -14,9 +14,9 @@ public class Jdbc {
     private final String globalIP = "zynoz.ddns.net";
     private final String localUsername = "etherstat";
     private final String localPW = "Ma1997xi!";
-    private final String piIP = "ourpi.ddns.net";
-    private final String piUsername = "ether";
-    private final String piPW = "etherstatpw";
+    private String piIP = "ourstatus.ddns.net";
+    private String piUsername = "Ether";
+    private String piPW = "S@tis1c";
 
     public void loadDriver() {
         try {
@@ -26,10 +26,22 @@ public class Jdbc {
         }
     }
 
+    public void setIP(String ip) {
+        piIP = ip;
+    }
+
+    public void setUsername(String username) {
+        piUsername = username;
+    }
+
+    public void setPassword(String password) {
+        piPW = password;
+    }
+
     public void establishConnection() {
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://" + localIP + "/etherstat" + "?user=" + localUsername + "&password=" + localPW +"&useSSL=false");
-            //connection = DriverManager.getConnection("jdbc:mysql://" + piIP + "/etherstat" + "?user=" + piUsername + "&password=" + piPW);
+//            connection = DriverManager.getConnection("jdbc:mysql://" + localIP + "/etherstat" + "?user=" + localUsername + "&password=" + localPW +"&useSSL=false");
+            connection = DriverManager.getConnection("jdbc:mysql://" + piIP + "/ether" + "?user=" + piUsername + "&password=" + piPW);
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
             System.out.println("SQLState: " + e.getSQLState());

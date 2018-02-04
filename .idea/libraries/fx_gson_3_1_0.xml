@@ -1,8 +1,6 @@
 <component name="libraryTable">
   <library name="fx-gson-3.1.0">
-    <CLASSES>
-      <root url="jar://D:/libraries/fx-gson-3.1.0.jar!/" />
-    </CLASSES>
+    <CLASSES />
     <JAVADOC />
     <SOURCES />
   </library>
