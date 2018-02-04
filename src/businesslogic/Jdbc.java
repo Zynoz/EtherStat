@@ -9,14 +9,9 @@ import java.time.LocalDateTime;
 public class Jdbc {
 
     private Connection connection = null;
-
-    private final String localIP = "192.168.0.102";
-    private final String globalIP = "zynoz.ddns.net";
-    private final String localUsername = "etherstat";
-    private final String localPW = "Ma1997xi!";
-    private String piIP = "ourstatus.ddns.net";
-    private String piUsername = "Ether";
-    private String piPW = "S@tis1c";
+    private String ip = "127.0.0.1";
+    private String piUsername = "ether";
+    private String piPW = "etherpw";
 
     public void loadDriver() {
         try {
@@ -27,7 +22,7 @@ public class Jdbc {
     }
 
     public void setIP(String ip) {
-        piIP = ip;
+        this.ip = ip;
     }
 
     public void setUsername(String username) {
@@ -41,7 +36,7 @@ public class Jdbc {
     public void establishConnection() {
         try {
 //            connection = DriverManager.getConnection("jdbc:mysql://" + localIP + "/etherstat" + "?user=" + localUsername + "&password=" + localPW +"&useSSL=false");
-            connection = DriverManager.getConnection("jdbc:mysql://" + piIP + "/etherstat" + "?user=" + piUsername + "&password=" + piPW);
+            connection = DriverManager.getConnection("jdbc:mysql://" + ip + "/etherstat" + "?user=" + piUsername + "&password=" + piPW);
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
             System.out.println("SQLState: " + e.getSQLState());

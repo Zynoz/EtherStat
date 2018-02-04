@@ -131,22 +131,6 @@ public class StartController implements Initializable {
 
 
         dropDown.getSelectionModel().selectFirst();
-
-        Runnable runnable = () -> {
-            while (true) {
-                dbEntry();
-                System.out.println("done");
-                try {
-                    Thread.sleep(600000);
-                    //workers.forEach(System.out::println);
-                    //Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        Thread thread = new Thread(runnable);
-        thread.start();
     }
 
     private void selectWorker(Worker worker) {
@@ -192,7 +176,9 @@ public class StartController implements Initializable {
 
     @FXML
     private void dbEntry() {
+        System.out.println("test");
         for (Worker worker : workers) {
+            System.out.println("test");
             jdbc.insert(worker);
         }
     }
@@ -214,7 +200,7 @@ public class StartController implements Initializable {
 
     @FXML
     private void setIP() {
-        TextInputDialog textInputDialog = new TextInputDialog();
+        TextInputDialog textInputDialog = new TextInputDialog("127.0.0.1");
         textInputDialog.setTitle("Choose database server");
         textInputDialog.setContentText("Enter IP or Domain of database server");
         Optional<String> result = textInputDialog.showAndWait();
@@ -223,7 +209,7 @@ public class StartController implements Initializable {
 
     @FXML
     private void setUsername() {
-        TextInputDialog textInputDialog = new TextInputDialog();
+        TextInputDialog textInputDialog = new TextInputDialog("ether");
         textInputDialog.setTitle("Choose username for database");
         textInputDialog.setContentText("Enter username to connect to the database server");
         Optional<String> result = textInputDialog.showAndWait();
@@ -232,7 +218,7 @@ public class StartController implements Initializable {
 
     @FXML
     private void setPassword() {
-        TextInputDialog textInputDialog = new TextInputDialog();
+        TextInputDialog textInputDialog = new TextInputDialog("etherpw");
         textInputDialog.setTitle("Choose password for database");
         textInputDialog.setContentText("Enter password for the specified username");
         Optional<String> result = textInputDialog.showAndWait();
@@ -244,6 +230,27 @@ public class StartController implements Initializable {
         jdbc.loadDriver();
         jdbc.establishConnection();
         reload();
+        startThread();
+    }
+
+    private void startThread() {
+        Runnable runnable = () -> {
+            System.out.println("thread started");
+            while (true) {
+                System.out.println("dbentry");
+                dbEntry();
+                System.out.println("done");
+                try {
+                    Thread.sleep(600000);
+                    workers.forEach(System.out::println);
+                    //Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
     }
 
     @FXML

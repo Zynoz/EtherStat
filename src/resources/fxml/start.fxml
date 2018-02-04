@@ -22,11 +22,11 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#close" text="Close" />
                   <MenuItem mnemonicParsing="false" onAction="#setIP" text="Set database" />
                   <MenuItem mnemonicParsing="false" onAction="#setUsername" text="set username" />
                   <MenuItem mnemonicParsing="false" onAction="#setPassword" text="Set password" />
                   <MenuItem mnemonicParsing="false" onAction="#connectDB" text="Connect to database" />
+              <MenuItem mnemonicParsing="false" onAction="#close" text="Close" />
             </items>
           </Menu>
             <Menu mnemonicParsing="false" text="Statistics">
