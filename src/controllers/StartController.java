@@ -1,9 +1,6 @@
 package controllers;
 
-import businesslogic.Jdbc;
-import businesslogic.JsonWorker;
-import businesslogic.Util;
-import businesslogic.Worker;
+import businesslogic.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -21,6 +18,7 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -30,6 +28,7 @@ public class StartController implements Initializable {
     private ObservableList<Worker> workers = FXCollections.observableArrayList();
     private ObservableList<Worker> dbEntries = FXCollections.observableArrayList();
     private ObservableList<String> workerNames = FXCollections.observableArrayList();
+    private HashMap<String, Double> avgs = new HashMap<>();
 
     private Jdbc jdbc;
     private boolean db = true;
@@ -189,40 +188,33 @@ public class StartController implements Initializable {
     }
 
     @FXML
-    private void chooseMiner() {
-        TextInputDialog textInputDialog = new TextInputDialog("7b1101df6f19c9c6fa5a2b4d2c579aeb52de07b9");
-        textInputDialog.setTitle("Choose Miner");
-        textInputDialog.setHeaderText("Choose a miner");
-        textInputDialog.setContentText("Please enter a miner address");
-        Optional<String> result = textInputDialog.showAndWait();
-        result.ifPresent(name -> minerAddress = name);
-    }
+    private void setup() {
+        TextInputDialog addressInput = new TextInputDialog("7b1101df6f19c9c6fa5a2b4d2c579aeb52de07b9");
+        addressInput.setTitle("Choose Miner");
+        addressInput.setHeaderText("Choose a miner");
+        addressInput.setContentText("Please enter a miner address");
+        Optional<String> minerReslut = addressInput.showAndWait();
+        minerReslut.ifPresent(name -> minerAddress = name);
 
-    @FXML
-    private void setIP() {
-        TextInputDialog textInputDialog = new TextInputDialog("127.0.0.1");
-        textInputDialog.setTitle("Choose database server");
-        textInputDialog.setContentText("Enter IP or Domain of database server");
-        Optional<String> result = textInputDialog.showAndWait();
-        result.ifPresent(ip -> jdbc.setIP(ip));
-    }
+        TextInputDialog ipInput = new TextInputDialog("127.0.0.1");
+        ipInput.setTitle("Choose database server");
+        ipInput.setContentText("Enter IP or Domain of database server");
+        Optional<String> ipResult = ipInput.showAndWait();
+        ipResult.ifPresent(ip -> jdbc.setIP(ip));
 
-    @FXML
-    private void setUsername() {
-        TextInputDialog textInputDialog = new TextInputDialog("ether");
-        textInputDialog.setTitle("Choose username for database");
-        textInputDialog.setContentText("Enter username to connect to the database server");
-        Optional<String> result = textInputDialog.showAndWait();
-        result.ifPresent(username -> jdbc.setUsername(username));
-    }
+        TextInputDialog nameInput = new TextInputDialog("ether");
+        nameInput.setTitle("Choose username for database");
+        nameInput.setContentText("Enter username to connect to the database server");
+        Optional<String> nameResult = nameInput.showAndWait();
+        nameResult.ifPresent(username -> jdbc.setUsername(username));
 
-    @FXML
-    private void setPassword() {
-        TextInputDialog textInputDialog = new TextInputDialog("etherpw");
-        textInputDialog.setTitle("Choose password for database");
-        textInputDialog.setContentText("Enter password for the specified username");
-        Optional<String> result = textInputDialog.showAndWait();
-        result.ifPresent(pw -> jdbc.setPassword(pw));
+        TextInputDialog passwordInput = new TextInputDialog("etherpw");
+        passwordInput.setTitle("Choose password for database");
+        passwordInput.setContentText("Enter password for the specified username");
+        Optional<String> passwordResult = passwordInput.showAndWait();
+        passwordResult.ifPresent(pw -> jdbc.setPassword(pw));
+
+        connectDB();
     }
 
     @FXML
@@ -231,6 +223,32 @@ public class StartController implements Initializable {
         jdbc.establishConnection();
         reload();
         startThread();
+    }
+
+    @FXML
+    private void export() {
+        for (String w : workerNames) {
+            avgs.put(w, calcAvg(w));
+        }
+
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(getClass().getResource("/resources/fxml/export.fxml"));
+        Scene scene = null;
+        try {
+            scene = new Scene(fxmlLoader.load());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        ExportController controller =
+                fxmlLoader.getController();
+        controller.initData(avgs);
+        Stage stage = new Stage();
+        stage.setResizable(false);
+        stage.setTitle("Export");
+        stage.setScene(scene);
+        stage.setAlwaysOnTop(true);
+        stage.showAndWait();
     }
 
     private void startThread() {
@@ -242,8 +260,8 @@ public class StartController implements Initializable {
                 System.out.println("done");
                 try {
                     Thread.sleep(600000);
+//                    Thread.sleep(10000);
                     workers.forEach(System.out::println);
-                    //Thread.sleep(10000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -298,6 +316,23 @@ public class StartController implements Initializable {
         }
     }
 
+    private double calcAvg(String worker) {
+        int count = 0;
+        double sum = 0;
+        for (Worker w : jdbc.getDbEntries()) {
+            if (worker.equals(w.getWorker())) {
+                sum += w.getCurrentHashrate().doubleValue();
+                count++;
+            }
+        }
+
+        double avg = sum / count;
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        calcAvg.setText(decimalFormat.format(avg) + " MH/s");
+        return avg;
+    }
+
+    @FXML
     public void calculateAvg() {
         int index = dropDown.getSelectionModel().getSelectedIndex();
         int count = 0;
@@ -308,8 +343,11 @@ public class StartController implements Initializable {
                 count++;
             }
         }
+
         double avg = sum / count;
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         calcAvg.setText(decimalFormat.format(avg) + " MH/s");
+
     }
+
 }

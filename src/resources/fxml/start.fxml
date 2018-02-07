@@ -22,22 +22,19 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-                  <MenuItem mnemonicParsing="false" onAction="#setIP" text="Set database" />
-                  <MenuItem mnemonicParsing="false" onAction="#setUsername" text="set username" />
-                  <MenuItem mnemonicParsing="false" onAction="#setPassword" text="Set password" />
-                  <MenuItem mnemonicParsing="false" onAction="#connectDB" text="Connect to database" />
               <MenuItem mnemonicParsing="false" onAction="#close" text="Close" />
             </items>
           </Menu>
             <Menu mnemonicParsing="false" text="Statistics">
               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#export" text="Export results" />
                 <MenuItem mnemonicParsing="false" text="Action 1" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="Settings">
-            <items>
-              <MenuItem mnemonicParsing="false" onAction="#chooseMiner" text="Choose Miner" />
-            </items>
+               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#setup" text="Setup" />
+               </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>
