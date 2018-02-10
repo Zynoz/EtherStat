@@ -36,11 +36,12 @@ public class Jdbc {
     public void establishConnection() {
         try {
 //            connection = DriverManager.getConnection("jdbc:mysql://" + localIP + "/etherstat" + "?user=" + localUsername + "&password=" + localPW +"&useSSL=false");
-            connection = DriverManager.getConnection("jdbc:mysql://" + ip + "/etherstat" + "?user=" + piUsername + "&password=" + piPW);
+            connection = DriverManager.getConnection("jdbc:mysql://" + ip + "/etherstat" + "?user=" + piUsername + "&password=" + piPW + "&useSSL=false");
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
             System.out.println("SQLState: " + e.getSQLState());
             System.out.println("VendorError: " + e.getErrorCode());
+            System.out.println("could not establish connection");
         }
     }
 

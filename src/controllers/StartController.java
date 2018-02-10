@@ -55,13 +55,13 @@ public class StartController implements Initializable {
     }
 
     private void init() {
+        //setup();
         dropDown.setItems(workerNames);
 
         table.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> selectWorker((Worker) newValue)));
         dbTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> selectWorker((Worker) newValue)));
         jsonWorkers.addAll(Util.getWorkers(minerAddress));
         workers.clear();
-        //convertWorkers();
         jdbc = new Jdbc();
         dbTable.setVisible(false);
         getWorkerNames();

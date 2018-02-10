@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
-
-
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ExportController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ExportController">
    <children>
-      <TableView fx:id="tableView" layoutX="14.0" layoutY="14.0" prefHeight="400.0" prefWidth="232.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <columns>
-          <TableColumn fx:id="workerColumn" prefWidth="143.0" text="Worker" />
-          <TableColumn fx:id="avgColumn" prefWidth="88.0" text="Average" />
-        </columns>
-      </TableView>
+      <TableView fx:id="tableView" layoutX="14.0" layoutY="14.0" prefHeight="400.0" prefWidth="232.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <Label fx:id="summe" layoutX="272.0" layoutY="14.0" text="Label" />
+      <Label layoutX="234.0" layoutY="14.0" text="Sum:" />
+      <Label layoutX="306.0" layoutY="138.0" text="Anteil in %:" />
+      <Label fx:id="percent" layoutX="376.0" layoutY="138.0" text="Label" />
    </children>
 </AnchorPane>
