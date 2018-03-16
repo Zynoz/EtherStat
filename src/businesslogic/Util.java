@@ -43,8 +43,6 @@ public class Util {
 
     public static List<JsonWorker> getWorkers(String minerAddress) {
         String fullJSON = getJson("https://api.ethermine.org/miner/" + minerAddress + "/workers");
-        System.out.println("https://api.ethermine.org/miner/" + minerAddress + "/workers");
-        //String fullJSON = getJson("https://api.ethermine.org/miner/7b1101df6f19c9c6fa5a2b4d2c579aeb52de07b9/workers");
         String withoutStart = fullJSON.replace("{\"status\":\"OK\",\"data\":", "");
         String withoutEnd = withoutStart.substring(0, withoutStart.length() - 1);
         Gson gson = new Gson();

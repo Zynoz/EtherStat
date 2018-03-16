@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="aopalliance-repackaged-2.5.0-b42">
-    <CLASSES />
-    <JAVADOC />
-    <SOURCES>
-      <root url="jar://$PROJECT_DIR$/lib/org.osgi.core-4.2.0.jar!/OSGI-OPT/src" />
-    </SOURCES>
-  </library>
-</component>

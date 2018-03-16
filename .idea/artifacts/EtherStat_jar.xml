@@ -3,12 +3,8 @@
     <output-path>$PROJECT_DIR$/out/artifacts/EtherStat_jar</output-path>
     <root id="archive" name="EtherStat.jar">
       <element id="module-output" name="EtherStat" />
-      <element id="library" level="project" name="fx-gson-3.1.0" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/mysql-connector-java-5.1.45-bin.jar" path-in-jar="/" />
-      <element id="library" level="project" name="aopalliance-repackaged-2.5.0-b42" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/gson-2.6.2.jar" path-in-jar="/" />
-      <element id="library" level="project" name="mysql-connector-java-5.1.45-bin" />
-      <element id="library" level="project" name="gson-2.6.2" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/mysql-connector-java-5.1.45-bin.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

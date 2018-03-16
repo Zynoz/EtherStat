@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="etherstat@192.168.0.102" uuid="3eaa1577-c257-4968-b632-3df04cdf384a">
+    <data-source source="LOCAL" name="ether@84.114.18.45" uuid="ca88d65e-4685-4822-9889-fd4855df033c">
       <driver-ref>mysql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://192.168.0.102:3306/etherstat</jdbc-url>
+      <jdbc-url>jdbc:mysql://84.114.18.45:3307/ether</jdbc-url>
       <driver-properties>
         <property name="autoReconnect" value="true" />
         <property name="zeroDateTimeBehavior" value="convertToNull" />

@@ -27,7 +27,7 @@ public class AboutController implements Initializable {
         lb1.setAlignment(Pos.CENTER);
         lb2.setAlignment(Pos.CENTER);
         lb1.setText("Created by Maximilian Moser");
-        lb2.setText("Version beta 0.3");
+        lb2.setText("Version 1.0");
     }
 
     public void close(ActionEvent actionEvent) {

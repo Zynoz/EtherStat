@@ -46,7 +46,6 @@ public class ExportController implements Initializable {
         tableView.getColumns().add(avg);
     }
 
-
     public void initData(HashMap<String, Double> avgs) {
         for (Double d : avgs.values()) {
             sum += d;
@@ -68,6 +67,5 @@ public class ExportController implements Initializable {
 
     private void selectKeyValue(KeyValue keyValue) {
         percent.setText(keyValue.getKey());
-
     }
 }

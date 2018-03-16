@@ -1,6 +1,10 @@
 package controllers;
 
-import businesslogic.*;
+import businesslogic.Jdbc;
+import businesslogic.JsonWorker;
+import businesslogic.Util;
+import businesslogic.Worker;
+import exceptions.MySQLException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -19,7 +23,6 @@ import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class StartController implements Initializable {
@@ -31,14 +34,7 @@ public class StartController implements Initializable {
     private HashMap<String, Double> avgs = new HashMap<>();
 
     private Jdbc jdbc;
-    private boolean db = true;
     private String minerAddress = "7b1101df6f19c9c6fa5a2b4d2c579aeb52de07b9";
-
-    @FXML
-    private Button viewDB;
-
-    @FXML
-    private TableView table;
 
     @FXML
     private TableView dbTable;
@@ -55,15 +51,13 @@ public class StartController implements Initializable {
     }
 
     private void init() {
-        //setup();
         dropDown.setItems(workerNames);
 
-        table.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> selectWorker((Worker) newValue)));
         dbTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> selectWorker((Worker) newValue)));
         jsonWorkers.addAll(Util.getWorkers(minerAddress));
         workers.clear();
         jdbc = new Jdbc();
-        dbTable.setVisible(false);
+        dbTable.setVisible(true);
         getWorkerNames();
 
         TableColumn workerName = new TableColumn("Name");
@@ -111,13 +105,6 @@ public class StartController implements Initializable {
         staleDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("staleShares"));
         timeDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("timest"));
 
-        table.setItems(workers);
-        table.getColumns().add(workerName);
-        table.getColumns().add(current);
-        table.getColumns().add(avg);
-        table.getColumns().add(valid);
-        table.getColumns().add(stale);
-        table.getColumns().add(time);
 
         dbTable.setItems(dbEntries);
         dbTable.getColumns().add(uuidDB);
@@ -130,6 +117,8 @@ public class StartController implements Initializable {
 
 
         dropDown.getSelectionModel().selectFirst();
+
+        connectDB();
     }
 
     private void selectWorker(Worker worker) {
@@ -143,25 +132,6 @@ public class StartController implements Initializable {
     }
 
     @FXML
-    private void switchView() {
-        if (db) {
-            reload();
-            dbTable.setVisible(true);
-            table.setVisible(false);
-            viewDB.setText("show recent");
-            db = false;
-            dropDown.getSelectionModel().selectFirst();
-        } else {
-            reload();
-            dbTable.setVisible(false);
-            table.setVisible(true);
-            viewDB.setText("show database");
-            db = true;
-            dropDown.getSelectionModel().selectFirst();
-        }
-    }
-
-    @FXML
     private void reload() {
         dbEntries.clear();
         jsonWorkers.clear();
@@ -169,17 +139,12 @@ public class StartController implements Initializable {
         workerNames.clear();
         jsonWorkers.addAll(Util.getWorkers(minerAddress));
         convertWorkers();
-        dbEntries.addAll(jdbc.getDbEntries());
-        getWorkerNames();
-    }
-
-    @FXML
-    private void dbEntry() {
-        System.out.println("test");
-        for (Worker worker : workers) {
-            System.out.println("test");
-            jdbc.insert(worker);
+        try {
+            dbEntries.addAll(jdbc.getDbEntries());
+        } catch (MySQLException e) {
+            alert(e.getMessage());
         }
+        getWorkerNames();
     }
 
     @FXML
@@ -188,41 +153,20 @@ public class StartController implements Initializable {
     }
 
     @FXML
-    private void setup() {
-        TextInputDialog addressInput = new TextInputDialog("7b1101df6f19c9c6fa5a2b4d2c579aeb52de07b9");
-        addressInput.setTitle("Choose Miner");
-        addressInput.setHeaderText("Choose a miner");
-        addressInput.setContentText("Please enter a miner address");
-        Optional<String> minerReslut = addressInput.showAndWait();
-        minerReslut.ifPresent(name -> minerAddress = name);
-
-        TextInputDialog ipInput = new TextInputDialog("127.0.0.1");
-        ipInput.setTitle("Choose database server");
-        ipInput.setContentText("Enter IP or Domain of database server");
-        Optional<String> ipResult = ipInput.showAndWait();
-        ipResult.ifPresent(ip -> jdbc.setIP(ip));
-
-        TextInputDialog nameInput = new TextInputDialog("ether");
-        nameInput.setTitle("Choose username for database");
-        nameInput.setContentText("Enter username to connect to the database server");
-        Optional<String> nameResult = nameInput.showAndWait();
-        nameResult.ifPresent(username -> jdbc.setUsername(username));
-
-        TextInputDialog passwordInput = new TextInputDialog("etherpw");
-        passwordInput.setTitle("Choose password for database");
-        passwordInput.setContentText("Enter password for the specified username");
-        Optional<String> passwordResult = passwordInput.showAndWait();
-        passwordResult.ifPresent(pw -> jdbc.setPassword(pw));
-
-        connectDB();
-    }
-
-    @FXML
     private void connectDB() {
         jdbc.loadDriver();
-        jdbc.establishConnection();
+        try {
+            jdbc.establishConnection();
+        } catch (MySQLException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("There was an error connecting to the database!\n" +
+                    "Check your internet connection\n" +
+                    "Maybe the database server is down.\n");
+            alert.setTitle(e.getMessage());
+            alert.showAndWait();
+        }
         reload();
-        startThread();
     }
 
     @FXML
@@ -249,26 +193,6 @@ public class StartController implements Initializable {
         stage.setScene(scene);
         stage.setAlwaysOnTop(true);
         stage.showAndWait();
-    }
-
-    private void startThread() {
-        Runnable runnable = () -> {
-            System.out.println("thread started");
-            while (true) {
-                System.out.println("dbentry");
-                dbEntry();
-                System.out.println("done");
-                try {
-                    Thread.sleep(600000);
-//                    Thread.sleep(10000);
-                    workers.forEach(System.out::println);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        Thread thread = new Thread(runnable);
-        thread.start();
     }
 
     @FXML
@@ -319,11 +243,15 @@ public class StartController implements Initializable {
     private double calcAvg(String worker) {
         int count = 0;
         double sum = 0;
-        for (Worker w : jdbc.getDbEntries()) {
-            if (worker.equals(w.getWorker())) {
-                sum += w.getCurrentHashrate().doubleValue();
-                count++;
+        try {
+            for (Worker w : jdbc.getDbEntries()) {
+                if (worker.equals(w.getWorker())) {
+                    sum += w.getCurrentHashrate().doubleValue();
+                    count++;
+                }
             }
+        } catch (MySQLException e) {
+            alert(e.getMessage());
         }
 
         double avg = sum / count;
@@ -337,17 +265,26 @@ public class StartController implements Initializable {
         int index = dropDown.getSelectionModel().getSelectedIndex();
         int count = 0;
         double sum = 0;
-        for (Worker w : jdbc.getDbEntries()) {
-            if (workerNames.get(index).equals(w.getWorker())) {
-                sum += w.getCurrentHashrate().doubleValue();
-                count++;
+        try {
+            for (Worker w : jdbc.getDbEntries()) {
+                if (workerNames.get(index).equals(w.getWorker())) {
+                    sum += w.getCurrentHashrate().doubleValue();
+                    count++;
+                }
             }
+        } catch (MySQLException e) {
+            alert(e.getMessage());
         }
 
         double avg = sum / count;
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         calcAvg.setText(decimalFormat.format(avg) + " MH/s");
-
     }
 
+    private void alert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setContentText("There was an error fetching the database entries!");
+        alert.setTitle(message);
+        alert.showAndWait();
+    }
 }

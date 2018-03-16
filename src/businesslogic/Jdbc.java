@@ -1,5 +1,6 @@
 package businesslogic;
 
+import exceptions.MySQLException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -9,9 +10,9 @@ import java.time.LocalDateTime;
 public class Jdbc {
 
     private Connection connection = null;
-    private String ip = "127.0.0.1";
-    private String piUsername = "ether";
-    private String piPW = "etherpw";
+    private String ip = "84.114.18.45:3307";
+    private String username = "Ether";
+    private String password = "S@tis1c";
 
     public void loadDriver() {
         try {
@@ -21,55 +22,24 @@ public class Jdbc {
         }
     }
 
-    public void setIP(String ip) {
-        this.ip = ip;
-    }
-
-    public void setUsername(String username) {
-        piUsername = username;
-    }
-
-    public void setPassword(String password) {
-        piPW = password;
-    }
-
-    public void establishConnection() {
+    public void establishConnection() throws MySQLException {
         try {
-//            connection = DriverManager.getConnection("jdbc:mysql://" + localIP + "/etherstat" + "?user=" + localUsername + "&password=" + localPW +"&useSSL=false");
-            connection = DriverManager.getConnection("jdbc:mysql://" + ip + "/etherstat" + "?user=" + piUsername + "&password=" + piPW + "&useSSL=false");
+            connection = DriverManager.getConnection("jdbc:mysql://" + ip + "/ether" + "?user=" + username + "&password=" + password + "&useSSL=false");
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
             System.out.println("SQLState: " + e.getSQLState());
             System.out.println("VendorError: " + e.getErrorCode());
             System.out.println("could not establish connection");
+            throw new MySQLException("Could not establish connection to database");
         }
     }
 
-    public void insert(Worker worker) {
-        if (worker != null) {
-            String sql = "INSERT INTO etherstat(name, avg, current, valid, stale, timest) VALUES(?, ?, ?, ?, ?, ?)";
-
-            try {
-                PreparedStatement preparedStatement = connection.prepareStatement(sql);
-                preparedStatement.setString(1, worker.getWorker());
-                preparedStatement.setDouble(2, worker.getAverageHashrate().doubleValue());
-                preparedStatement.setDouble(3, worker.getCurrentHashrate().doubleValue());
-                preparedStatement.setInt(4, worker.getValidShares());
-                preparedStatement.setInt(5, worker.getStaleShares());
-                preparedStatement.setTimestamp(6, Timestamp.valueOf(LocalDateTime.now()));
-                preparedStatement.executeUpdate();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public ObservableList<Worker> getDbEntries() {
+    public ObservableList<Worker> getDbEntries() throws MySQLException {
         ObservableList<Worker> workers = FXCollections.observableArrayList();
         PreparedStatement preparedStatement = null;
         ResultSet resultSet;
         try {
-            preparedStatement = connection.prepareStatement("SELECT * FROM etherstat");
+            preparedStatement = connection.prepareStatement("SELECT * FROM ether");
             resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
@@ -78,6 +48,7 @@ public class Jdbc {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new MySQLException(e.getMessage());
         } finally {
             if (preparedStatement != null) {
                 try {
