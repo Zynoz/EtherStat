@@ -106,7 +106,6 @@ public class StartController implements Initializable {
         staleDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("staleShares"));
         timeDB.setCellValueFactory(new PropertyValueFactory<Worker, String>("timest"));
 
-
         dbTable.setItems(dbEntries);
         dbTable.getColumns().add(uuidDB);
         dbTable.getColumns().add(workerNameDB);
@@ -115,7 +114,6 @@ public class StartController implements Initializable {
         dbTable.getColumns().add(validDB);
         dbTable.getColumns().add(staleDB);
         dbTable.getColumns().add(time);
-
 
         dropDown.getSelectionModel().selectFirst();
 
@@ -185,8 +183,7 @@ public class StartController implements Initializable {
             e.printStackTrace();
         }
 
-        ExportController controller =
-                fxmlLoader.getController();
+        ExportController controller = fxmlLoader.getController();
         controller.initData(avgs);
         Stage stage = new Stage();
         stage.setResizable(false);
