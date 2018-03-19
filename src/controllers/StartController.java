@@ -5,6 +5,7 @@ import businesslogic.JsonWorker;
 import businesslogic.Util;
 import businesslogic.Worker;
 import exceptions.MySQLException;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -149,7 +150,7 @@ public class StartController implements Initializable {
 
     @FXML
     private void close() {
-        System.exit(0);
+        Platform.exit();
     }
 
     @FXML
