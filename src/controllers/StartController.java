@@ -54,7 +54,10 @@ public class StartController implements Initializable {
     private void init() {
         dropDown.setItems(workerNames);
 
-        dbTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> selectWorker((Worker) newValue)));
+        dbTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
+            selectWorker((Worker) newValue);
+            calculateAvg();
+        }));
         jsonWorkers.addAll(Util.getWorkers(minerAddress));
         workers.clear();
         jdbc = new Jdbc();
@@ -171,7 +174,7 @@ public class StartController implements Initializable {
     @FXML
     private void export() {
         for (String w : workerNames) {
-            avgs.put(w, calcAvg(w));
+//            avgs.put(w, calcAvg(w));
         }
 
         FXMLLoader fxmlLoader = new FXMLLoader();
@@ -238,45 +241,52 @@ public class StartController implements Initializable {
         }
     }
 
-    private double calcAvg(String worker) {
-        int count = 0;
-        double sum = 0;
-        try {
-            for (Worker w : jdbc.getDbEntries()) {
-                if (worker.equals(w.getWorker())) {
-                    sum += w.getCurrentHashrate().doubleValue();
-                    count++;
-                }
-            }
-        } catch (MySQLException e) {
-            alert(e.getMessage());
-        }
-
-        double avg = sum / count;
-        DecimalFormat decimalFormat = new DecimalFormat("#.##");
-        calcAvg.setText(decimalFormat.format(avg) + " MH/s");
-        return avg;
-    }
+//    private double calcAvg(String worker) {
+//        double avg;
+//        new Thread(() -> {
+//            int count = 0;
+//            double sum = 0;
+//            try {
+//                for (Worker w : jdbc.getDbEntries()) {
+//                    if (worker.equals(w.getWorker())) {
+//                        sum += w.getCurrentHashrate().doubleValue();
+//                        count++;
+//                    }
+//                }
+//            } catch (MySQLException e) {
+//                alert(e.getMessage());
+//            }
+//            avg = sum / count;
+//            DecimalFormat decimalFormat = new DecimalFormat("#.##");
+//            Platform.runLater(() -> {
+//                calcAvg.setText(decimalFormat.format(avg) + " MH/s");
+//                return avg;
+//            });
+//        }).start();
+//
+//    }
 
     @FXML
     public void calculateAvg() {
-        int index = dropDown.getSelectionModel().getSelectedIndex();
-        int count = 0;
-        double sum = 0;
-        try {
-            for (Worker w : jdbc.getDbEntries()) {
-                if (workerNames.get(index).equals(w.getWorker())) {
-                    sum += w.getCurrentHashrate().doubleValue();
-                    count++;
+        new Thread(() -> {
+            int index = dropDown.getSelectionModel().getSelectedIndex();
+            int count = 0;
+            double sum = 0;
+            try {
+                for (Worker w : jdbc.getDbEntries()) {
+                    if (workerNames.get(index).equals(w.getWorker())) {
+                        sum += w.getCurrentHashrate().doubleValue();
+                        count++;
+                    }
                 }
+            } catch (MySQLException e) {
+                alert(e.getMessage());
             }
-        } catch (MySQLException e) {
-            alert(e.getMessage());
-        }
 
-        double avg = sum / count;
-        DecimalFormat decimalFormat = new DecimalFormat("#.##");
-        calcAvg.setText(decimalFormat.format(avg) + " MH/s");
+            double avg = sum / count;
+            DecimalFormat decimalFormat = new DecimalFormat("#.##");
+            Platform.runLater(() -> calcAvg.setText(decimalFormat.format(avg) + " MH/s"));
+        }).start();
     }
 
     private void alert(String message) {
