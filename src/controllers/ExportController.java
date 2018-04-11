@@ -1,6 +1,6 @@
 package controllers;
 
-import businesslogic.KeyValue;
+import model.KeyValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

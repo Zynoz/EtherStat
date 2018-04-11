@@ -1,11 +1,10 @@
-package businesslogic;
+package model;
 
 import exceptions.MySQLException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 
 public class Jdbc {
 

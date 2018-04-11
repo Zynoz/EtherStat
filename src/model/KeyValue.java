@@ -1,4 +1,4 @@
-package businesslogic;
+package model;
 
 public class KeyValue {
     private String key;

@@ -1,9 +1,9 @@
 package controllers;
 
-import businesslogic.Jdbc;
-import businesslogic.JsonWorker;
-import businesslogic.Util;
-import businesslogic.Worker;
+import model.Jdbc;
+import model.JsonWorker;
+import model.Util;
+import model.Worker;
 import exceptions.MySQLException;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;

@@ -1,21 +1,45 @@
-package businesslogic;
+package model;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
-public class JsonWorker {
+public class Worker {
+    private int id;
     private String worker;
-    private long time;
-    private long lastSeen;
     private BigDecimal reportedHashrate;
     private BigDecimal currentHashrate;
     private int validShares;
     private int invalidShares;
     private int staleShares;
     private BigDecimal averageHashrate;
+    private Timestamp timest;
 
-    public JsonWorker() {
+    public Worker(int id, String worker, BigDecimal reportedHashrate, BigDecimal currentHashrate, int validShares, int invalidShares, int staleShares, BigDecimal averageHashrate, Timestamp timest) {
+        setId(id);
+        setWorker(worker);
+        setReportedHashrate(reportedHashrate);
+        setCurrentHashrate(currentHashrate);
+        setValidShares(validShares);
+        setInvalidShares(invalidShares);
+        setStaleShares(staleShares);
+        setAverageHashrate(averageHashrate);
+        setTimest(timest);
+    }
 
+    public Timestamp getTimest() {
+        return timest;
+    }
+
+    public void setTimest(Timestamp timest) {
+        this.timest = timest;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getWorker() {
@@ -26,28 +50,16 @@ public class JsonWorker {
         this.worker = worker;
     }
 
-    public long getTime() {
-        return time;
-    }
-
-    public void setTime(long time) {
-        this.time = time;
-    }
-
-    public long getLastSeen() {
-        return lastSeen;
-    }
-
-    public void setLastSeen(long lastSeen) {
-        this.lastSeen = lastSeen;
-    }
-
     public BigDecimal getReportedHashrate() {
         return reportedHashrate;
     }
 
     public void setReportedHashrate(BigDecimal reportedHashrate) {
-        this.reportedHashrate = reportedHashrate;
+        if (reportedHashrate != null) {
+            this.reportedHashrate = reportedHashrate;
+        } else {
+            this.reportedHashrate = BigDecimal.valueOf(0);
+        }
     }
 
     public BigDecimal getCurrentHashrate() {
@@ -55,7 +67,11 @@ public class JsonWorker {
     }
 
     public void setCurrentHashrate(BigDecimal currentHashrate) {
-        this.currentHashrate = currentHashrate;
+        if (currentHashrate != null) {
+            this.currentHashrate = currentHashrate;
+        } else {
+            this.currentHashrate = BigDecimal.valueOf(0);
+        }
     }
 
     public int getValidShares() {
@@ -87,21 +103,25 @@ public class JsonWorker {
     }
 
     public void setAverageHashrate(BigDecimal averageHashrate) {
-        this.averageHashrate = averageHashrate;
+        if (averageHashrate != null) {
+            this.averageHashrate = averageHashrate;
+        } else {
+            this.averageHashrate = BigDecimal.valueOf(0);
+        }
     }
 
     @Override
     public String toString() {
-        return "JsonWorker{" +
-                "worker='" + worker + '\'' +
-                ", time=" + time +
-                ", lastSeen=" + lastSeen +
+        return "Worker{" +
+                "id=" + id +
+                ", worker='" + worker + '\'' +
                 ", reportedHashrate=" + reportedHashrate +
                 ", currentHashrate=" + currentHashrate +
                 ", validShares=" + validShares +
                 ", invalidShares=" + invalidShares +
                 ", staleShares=" + staleShares +
                 ", averageHashrate=" + averageHashrate +
+                ", timest=" + timest +
                 '}';
     }
 }
